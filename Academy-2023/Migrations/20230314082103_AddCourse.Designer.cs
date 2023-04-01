@@ -3,6 +3,7 @@ using System;
 using Academy_2023.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Academy_2023.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230314082103_AddCourse")]
+    partial class AddCourse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.14");
@@ -33,12 +35,9 @@ namespace Academy_2023.Migrations
 
             modelBuilder.Entity("Academy_2023.Data.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -48,16 +47,10 @@ namespace Academy_2023.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("LastName")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Password")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Role")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

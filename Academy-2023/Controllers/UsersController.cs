@@ -1,74 +1,74 @@
-﻿using Academy_2023.Data;
-using Academy_2023.Repositories;
+﻿using Academy_2023.Dto;
+using Academy_2023.Helpers;
+using Academy_2023.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Academy_2023.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UsersController : ControllerBase
     {
-        private readonly UserRepository _userRepository;
+        private readonly IUserService _userService;
 
-        public UsersController()
+        public UsersController(IUserService userService, IOptions<LogLevelHelper> logLeveloptions)
         {
-            _userRepository = new UserRepository();
+            _userService = userService;
+
+            Console.WriteLine(logLeveloptions.Value.Default);       // test purpose, options pattern szemléltetése
         }
 
-        // GET: api/<UsersController>/get
+        // GET: api/<UsersController>
         [HttpGet]
-        public IEnumerable<User> Get()
+        [Authorize(Policy = "AdminOnlyPolicy")]
+        public IEnumerable<UserListDto> Get()
         {
-            return _userRepository.GetAll();
+            return _userService.GetAll();
         }
 
-
-        // GET: api/<UsersController>/getadults
-        [HttpGet]
-        public IEnumerable<User> GetAdults()
-        {
-            return _userRepository.GetAdults();
-        }
-
-        // GET api/<UsersController>/get/5
+        // GET api/<UsersController>/5
         [HttpGet("{id}")]
-        public ActionResult<User> Get(int id)
+        public ActionResult<UserListDto> Get(int id)
         {
-            var user = _userRepository.GetById(id);
+            var user = _userService.GetById(id);
 
             return user == null ? NotFound() : user;
         }
 
-        // POST api/<UsersController>/post
+        // POST api/<UsersController>
         [HttpPost]
-        public ActionResult Post([FromBody] User data)
+        [AllowAnonymous]
+        public ActionResult Post([FromBody] CreateUserDto data)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _userRepository.Create(data);
+            _userService.Create(data);
 
             return NoContent();
         }
 
-        // PUT api/<UsersController>/put/5
+        // PUT api/<UsersController>/5
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] User data)
+        public ActionResult Put(int id, [FromBody] CreateUserDto data)
         {
-            var user = _userRepository.Update(id, data);
+            var user = _userService.Update(id, data);
 
             return user == null ? NotFound() : NoContent();
         }
 
-        // DELETE api/<UsersController>/delete/5
+        // DELETE api/<UsersController>/5
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
-            return _userRepository.Delete(id) ? NoContent() : NotFound();
+            return _userService.Delete(id) ? NoContent() : NotFound();
         }
     }
 }

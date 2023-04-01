@@ -1,19 +1,20 @@
 ﻿using Academy_2023.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Academy_2023.Repositories
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
     {
-        private readonly ApplicationDbContext _context = new ApplicationDbContext();
+        private readonly ApplicationDbContext _context;
+
+        public UserRepository(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
         public IEnumerable<User> GetAll()
         {
             return _context.Users.ToList();
-        }
-
-        public IEnumerable<User> GetAdults()
-        {
-            return _context.Users.Where(user => user.BirthDate.Date.AddYears(18) <= DateTime.Today ).ToList();
         }
 
         public User? GetById(int id)
@@ -28,21 +29,9 @@ namespace Academy_2023.Repositories
             _context.SaveChanges();
         }
 
-        public User? Update(int id, User data)
+        public void Update()
         {
-            var user = _context.Users.FirstOrDefault(x => x.Id == id);
-
-            if (user != null)
-            {
-                user.Email = data.Email;
-                user.Password = data.Password;
-                user.FirstName = data.FirstName;
-                user.LastName = data.LastName;
-
-                _context.SaveChanges();
-            }
-
-            return user;
+            _context.SaveChanges();
         }
 
         public bool Delete(int id)
@@ -59,6 +48,11 @@ namespace Academy_2023.Repositories
             }
 
             return false;
+        }
+
+        public Task<User?> GetByEmailAsync(string email)
+        {
+            return _context.Users.SingleOrDefaultAsync(u => u.Email == email);
         }
     }
 }
